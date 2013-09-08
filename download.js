@@ -7,11 +7,27 @@ function write (filename) {
   }
 }
 
-metrics.portals.map(function(portal) {
+var portals = [
+  'data.austintexas.gov',
+  'data.cityofnewyork.us',
+  'data.hawaii.gov',
+  'explore.data.gov',
+  'bronx.lehman.cuny.edu',
+  'data.sfgov.org',
+  'data.baltimorecity.gov',
+  'data.oregon.gov',
+  'data.raleighnc.gov',
+  'finances.worldbank.org',
+  'data.ok.gov',
+  'data.seattle.gov',
+  'data.montgomerycountymd.gov'
+]
+
+portals.map(function(portal) {
   var day = new Date('2010-01-01')
-//var day = new Date('2013-09-06')
+  var day = new Date('2013-09-06')
   while (day <= new Date()) {
-    var identifier = [day.getFullYear(), day.getMonth(), day.getDate(), portal].join('-')
+    var identifier = [day.getFullYear(), day.getMonth() + 1, day.getDate(), portal].join('-')
 
     metrics.daily.site(portal, day, write('site-' + identifier))
 
