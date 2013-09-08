@@ -1,8 +1,7 @@
 var request  = require('request')
-  , fs       = require('fs')
 
 var get = function(portal, route, callback) {
-  var url = 'https://' + portal + route;
+  var url = 'https://' + portal + route + '&$$app_token=' + 'gTddlqVLsV4DkBlXnDSwnTazB';
   request(url, function(error, response, body) {
     if (error) {
       throw error
@@ -122,28 +121,3 @@ module.exports.portals = [
   'data.oregon.gov'
 ]
 
-var socrata = module.exports
-
-
-function write (filename) {
-  return function(body) {
-    fs.writeFile('data/' + filename, JSON.stringify(body))
-  }
-}
-
-socrata.portals.map(function(portal) {
-  var day = new Date('2010-01-01')
-  var day = new Date('2013-09-06')
-  while (day <= new Date()) {
-    var identifier = [day.getFullYear(), day.getMonth(), day.getDate(), portal].join('-')
-
-    socrata.daily.site(portal, day, write('site-' + identifier))
-
-    module.exports.daily.top('DATASETS', portal, date, write('top-datasets-' + identifier))
-    module.exports.daily.top('REFERRERS', portal, date, write('top-referrers-' + identifier))
-    module.exports.daily.top('EMBEDS', portal, date, write('top-embeds-' + identifier))
-    module.exports.daily.top('SEARCHES', portal, date, write('top-searches-' + identifier))
-
-    day.setDate(day.getDate() + 1)
-  }
-})
