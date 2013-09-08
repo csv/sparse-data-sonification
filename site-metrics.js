@@ -1,4 +1,5 @@
 var request  = require('request')
+  , fs       = require('fs')
 
 var get = function(portal, route, callback) {
   var url = 'https://' + portal + route;
@@ -11,44 +12,47 @@ var get = function(portal, route, callback) {
   })
 }
 
-// get('/api/site_metrics.json?start=1375315200000&end=1376438399999', function(a) { console.log(a) }, 'data.oregon.gov')
+module.exports.raw = {}
 
-module.exports.series = function(portal, slice, start, end, callback){
-  var route = '/api/site_metrics.json?method=series&slice=' + slice + '&start=' + start + '&end=' + end;
-
-  function metaCallback(body){
-    callback(body.map(reshapeRow))
-  }
-
-  function reshapeRow (oldRow) {
-    var newRow = oldRow.metrics
-    var date = new Date()
-    date.setTime(oldRow.__start__)
-    newRow.date = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate()
-    newRow.portal = portal
-    return newRow
-  }
-
-  get(portal, route, metaCallback)
+module.exports.raw.site = function(portal, start, end, callback){
+  var route = '/api/site_metrics.json?start=' + start + '&end=' + end;
+  get(portal, route, callback)
 }
 
-/*
-module.exports.topDatasets = function(start, end){
-  return get('/api/site_metrics.json?method=top&top=DATASETS&start=' + start + '&end=' + end)
+module.exports.raw.topDatasets = function(portal, start, end, callback){
+  get(portal, '/api/site_metrics.json?method=top&top=DATASETS&start=' + start + '&end=' + end, callback)
 }
 
-module.exports.topReferrers = function(start, end){
-  return get('/api/site_metrics.json?method=top&top=REFERRERS&start=' + start + '&end=' + end)
+module.exports.raw.topReferrers = function(portal, start, end, callback){
+  get(portal, '/api/site_metrics.json?method=top&top=REFERRERS&start=' + start + '&end=' + end, callback)
 }
 
-module.exports.topSearches = function(start, end){
-  return get('/api/site_metrics.json?method=top&top=SEARCHES&start=' + start + '&end=' + end)
+module.exports.raw.topSearches = function(portal, start, end, callback){
+  get(portal, '/api/site_metrics.json?method=top&top=SEARCHES&start=' + start + '&end=' + end, callback)
 }
 
-module.exports.topEmbeds = function(start, end){
-  return get('/api/site_metrics.json?method=top&top=EMBEDS&start=' + start + '&end=' + end)
+module.exports.raw.topEmbeds = function(portal, start, end, callback){
+  get(portal, '/api/site_metrics.json?method=top&top=EMBEDS&start=' + start + '&end=' + end, callback)
 }
-*/
+
+function startEnd(day) {
+  date = new Date(day)
+  var isoDate = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate()
+  var start = new Date(isoDate).getTime()
+  var end = start + 24 * 3600 * 1000
+  return {"start":start,"end":end,"isoDate":isoDate}
+}
+
+module.exports.daily = {}
+module.exports.daily.site = function(portal, date, callback) {
+  var day = startEnd(date)
+  module.exports.raw.site(portal, day.start, day.end, function(body){
+    body.date = day.isoDate
+    body.portal = portal
+    return body
+  })
+}
+
 
 module.exports.portals = [
   'data.colorado.gov',
@@ -119,8 +123,17 @@ module.exports.portals = [
 
 var socrata = module.exports
 
-module.exports.portals.map(function(portal) {
-  return socrata.series(portal, 'DAILY', '1375315200000', '1376438399999', function(body){
-    console.log(body)
-  })
+
+function write (portal) {
+  return function(body) {
+    return console.log(body)
+    fs.writeFile('data/' + portal, JSON.stringify(body))
+  }
+}
+
+
+socrata.portals.map(function(portal) {
+//socrata.series(portal, 'DAILY', '1375315200000', '1376438399999', write(portal))
+//socrata.topDatasets(portal, '1375315200000', '1376438399999', write(portal))
+  socrata.daily.site(portal, '2013-09-01', write(portal))
 })
