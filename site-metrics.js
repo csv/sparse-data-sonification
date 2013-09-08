@@ -1,10 +1,8 @@
-var curry    = require('curry')
-  , parallel = require('parallel-commands')
+var parallel = require('parallel-commands')
   , request  = require('request')
 
-var get = curry(function(route, callback, portal) {
+var get = function(portal, route, callback) {
   var url = 'https://' + portal + route;
-  console.log(url);
   request(url, function(error, response, body) {
     if (error) {
       throw error
@@ -12,14 +10,15 @@ var get = curry(function(route, callback, portal) {
       callback(JSON.parse(body))
     }
   })
-})
+}
 
 // get('/api/site_metrics.json?start=1375315200000&end=1376438399999', function(a) { console.log(a) }, 'data.oregon.gov')
 
-module.exports.series = function(start, end){
-  return get('/api/site_metrics.json?start=' + start + '&end=' + end)
+module.exports.series = function(portal, slice, start, end, callback){
+  return get(portal, '/api/site_metrics.json?method=series&slice=' + slice + '&start=' + start + '&end=' + end, callback)
 }
 
+/*
 module.exports.topDatasets = function(start, end){
   return get('/api/site_metrics.json?method=top&top=DATASETS&start=' + start + '&end=' + end)
 }
@@ -35,12 +34,11 @@ module.exports.topSearches = function(start, end){
 module.exports.topEmbeds = function(start, end){
   return get('/api/site_metrics.json?method=top&top=EMBEDS&start=' + start + '&end=' + end)
 }
+*/
 
 module.exports.portals = [
   'data.colorado.gov',
-  'data.nola.gov'
-];
-[
+  'data.nola.gov',
   'healthmeasures.aspe.hhs.gov',
   'data.cityofchicago.org',
   'data.wa.gov',
@@ -101,10 +99,14 @@ module.exports.portals = [
   'data.medicare.gov'
 ]
 
+module.exports.portals = [
+  'data.oregon.gov'
+]
+
 var socrata = module.exports
 
 var commands = parallel(module.exports.portals.map(function(portal) {
-  return socrata.series('1375315200000', '1376438399999')(function(body){
+  return socrata.series(portal, 'DAILY', '1375315200000', '1376438399999', function(body){
     console.log(body)
   })
 }))
