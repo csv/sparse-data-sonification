@@ -13,29 +13,11 @@ var get = function(portal, route, callback) {
 }
 
 module.exports.raw = {}
-
 module.exports.raw.site = function(portal, start, end, callback){
   var route = '/api/site_metrics.json?start=' + start + '&end=' + end;
   get(portal, route, callback)
 }
-
-module.exports.raw.topDatasets = function(portal, start, end, callback){
-  get(portal, '/api/site_metrics.json?method=top&top=DATASETS&start=' + start + '&end=' + end, callback)
-}
-
-module.exports.raw.topReferrers = function(portal, start, end, callback){
-  get(portal, '/api/site_metrics.json?method=top&top=REFERRERS&start=' + start + '&end=' + end, callback)
-}
-
-module.exports.raw.topSearches = function(portal, start, end, callback){
-  get(portal, '/api/site_metrics.json?method=top&top=SEARCHES&start=' + start + '&end=' + end, callback)
-}
-
-module.exports.raw.topEmbeds = function(portal, start, end, callback){
-  get(portal, '/api/site_metrics.json?method=top&top=EMBEDS&start=' + start + '&end=' + end, callback)
-}
-
-module.exports.raw._top = function(topType, portal, start, end, callback) {
+module.exports.raw.top = function(topType, portal, start, end, callback) {
   get(portal, '/api/site_metrics.json?method=top&top=' + topType + '&start=' + start + '&end=' + end, callback)
 }
 
@@ -56,9 +38,9 @@ module.exports.daily.site = function(portal, date, callback) {
     callback(body)
   })
 }
-module.exports.daily._top = function(topType, portal, date, callback) {
+module.exports.daily.top = function(topType, portal, date, callback) {
   var day = startEnd(date)
-  module.exports.raw._top(topType, portal, day.start, day.end, function(body) {
+  module.exports.raw.top(topType, portal, day.start, day.end, function(body) {
     var reshapedBody = reshapeTop(day.isoDate, portal, body)
     callback(reshapedBody)
   })
@@ -72,9 +54,6 @@ function reshapeTop(isoDate, portal, body) {
   return output
 }
 
-module.exports.daily.topDatasets = function(portal, date, callback) {
-  module.exports.daily._top('DATASETS', portal, date, callback)
-}
 
 module.exports.portals = [
   'data.colorado.gov',
@@ -152,15 +131,19 @@ function write (filename) {
   }
 }
 
-
 socrata.portals.map(function(portal) {
-//socrata.series(portal, 'DAILY', '1375315200000', '1376438399999', write(portal))
-//socrata.topDatasets(portal, '1375315200000', '1376438399999', write(portal))
   var day = new Date('2010-01-01')
-  var day = new Date('2013-09-05')
+  var day = new Date('2013-09-06')
   while (day <= new Date()) {
     var identifier = [day.getFullYear(), day.getMonth(), day.getDate(), portal].join('-')
+
     socrata.daily.site(portal, day, write('site-' + identifier))
+
+    module.exports.daily.top('DATASETS', portal, date, write('top-datasets-' + identifier))
+    module.exports.daily.top('REFERRERS', portal, date, write('top-referrers-' + identifier))
+    module.exports.daily.top('EMBEDS', portal, date, write('top-embeds-' + identifier))
+    module.exports.daily.top('SEARCHES', portal, date, write('top-searches-' + identifier))
+
     day.setDate(day.getDate() + 1)
   }
 })
