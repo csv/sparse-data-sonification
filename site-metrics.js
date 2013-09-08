@@ -14,8 +14,22 @@ var get = function(portal, route, callback) {
 
 // get('/api/site_metrics.json?start=1375315200000&end=1376438399999', function(a) { console.log(a) }, 'data.oregon.gov')
 
-module.exports.series = function(portal, slice, start, end, callback){
-  return get(portal, '/api/site_metrics.json?method=series&slice=' + slice + '&start=' + start + '&end=' + end, callback)
+module.exports.series = function(slice, start, end, callback){
+  var route = '/api/site_metrics.json?method=series&slice=' + slice + '&start=' + start + '&end=' + end;
+
+  function metaCallback(body){
+    callback(body.map(reshapeRow))
+  }
+
+  function reshapeRow (oldRow) {
+    var newRow = oldRow.metrics
+    newRow.date = new Date()
+    newRow.date.setTime(oldRow.__start__)
+  }
+
+  return function(portal) {
+    get(portal, route, metaCallback)
+  }
 }
 
 /*
@@ -106,7 +120,7 @@ module.exports.portals = [
 var socrata = module.exports
 
 var commands = parallel(module.exports.portals.map(function(portal) {
-  return socrata.series(portal, 'DAILY', '1375315200000', '1376438399999', function(body){
+  return socrata.series('DAILY', '1375315200000', '1376438399999', function(body){
     console.log(body)
   })
 }))
