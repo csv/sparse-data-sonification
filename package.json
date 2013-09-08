@@ -1,0 +1,23 @@
+{
+  "name": "sparse-data-sonification",
+  "version": "0.0.0",
+  "description": "A sonification of XXX, demonstrating the use of ambient music for sparse data sonification",
+  "main": "script.js",
+  "dependencies": {
+    "jsynth": "~3.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/csv/sparse-data-sonification.git"
+  },
+  "keywords": [
+    "sonification",
+    "music"
+  ],
+  "author": "Thomas Levine <occurrence@thomaslevine.com>",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/csv/sparse-data-sonification/issues"
+  }
+}
