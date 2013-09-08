@@ -2,7 +2,7 @@
   "name": "sparse-data-sonification",
   "version": "0.0.0",
   "description": "A sonification of XXX, demonstrating the use of ambient music for sparse data sonification",
-  "main": "script.js",
+  "main": "music.js",
   "dependencies": {
     "jsynth": "~3.0.0"
   },
