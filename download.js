@@ -25,7 +25,7 @@ var portals = [
 
 portals.map(function(portal) {
   var day = new Date('2010-01-01')
-  var day = new Date('2013-09-06')
+//var day = new Date('2013-09-06')
   while (day <= new Date()) {
     var identifier = [day.getFullYear(), day.getMonth() + 1, day.getDate(), portal].join('-')
 
