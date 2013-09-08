@@ -1,1 +1,2 @@
-read.csv('sewer.csv')
+sewer <- read.csv('sewer.csv')
+
