@@ -49,7 +49,7 @@ module.exports.daily.site = function(portal, date, callback) {
   module.exports.raw.site(portal, day.start, day.end, function(body){
     body.date = day.isoDate
     body.portal = portal
-    return body
+    callback(body)
   })
 }
 
@@ -124,10 +124,10 @@ module.exports.portals = [
 var socrata = module.exports
 
 
-function write (portal) {
+function write (filename) {
   return function(body) {
-    return console.log(body)
-    fs.writeFile('data/' + portal, JSON.stringify(body))
+    console.log(body)
+    fs.writeFile('data/' + filename, JSON.stringify(body))
   }
 }
 
@@ -135,5 +135,10 @@ function write (portal) {
 socrata.portals.map(function(portal) {
 //socrata.series(portal, 'DAILY', '1375315200000', '1376438399999', write(portal))
 //socrata.topDatasets(portal, '1375315200000', '1376438399999', write(portal))
-  socrata.daily.site(portal, '2013-09-01', write(portal))
+  var day = new Date('2010-01-01')
+  var day = new Date('2013-09-05')
+  while (day <= new Date()) {
+    socrata.daily.site(portal, day, write([day.getFullYear(), day.getMonth(), day.getDate(), portal].join('-')))
+    day.setDate(day.getDate() + 1)
+  }
 })
