@@ -5,15 +5,12 @@ var tau = Math.PI * 2
 
 function instrument(data,field) {
   return function (time, index, input){
-    var i = Math.round(time * 10000)
-    var freq = 440 * data[i][field] * 1e8
-    console.log(freq)
-    return freq
+    var i = index % data.length
+    // var freq = Math.pow(2, Math.round(data[i][field] * 1e4))
+    console.log(data[i][field] * 1e8)
+    return Math.sin(time * tau * freq)
   }
 }
-
-// var synth = jsynth(master, sineGenerator); // returns a web audio node
-// synth.connect(master.destination)
 
 request('ferry.smooth.json', function(err, res, body){
   var data = JSON.parse(body).map(function(x) { return x[0]})
