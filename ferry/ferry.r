@@ -13,13 +13,10 @@ ferry.smooth <- data.frame(
   Year = rep(ferry$Year, each = k),
   Month = rep(ferry$Month, each = k),
   Downtown.Passengers = density(ferry$Downtown.Passengers, n = k * nrow(ferry))$y,
-  Midtown.Passengers = density(ferry$Midtown.Passengers, n = k * nrow(ferry))$y
+  Midtown.Passengers = density(ferry$Midtown.Passengers, n = k * nrow(ferry))$y,
+  Downtown.Passengers.Freq = freq(ferry$Downtown.Passengers),
+  Midtown.Passengers.Freq = freq(ferry$Midtown.Passengers)
 )
 
-a <- arpeggidata(ferry.smooth$Downtown.Passengers, sinewave, bpm = 10 / k)
-b <- arpeggidata(ferry.smooth$Midtown.Passengers, sweeplow, bpm = 10 / k)
-# play(b)
-# play(sequence(list(b)))
-
-
 # write(toJSON(apply(ferry.smooth, 1, list)), 'ferry.smooth.json')
+write.csv(ferry.smooth, 'ferry.smooth.csv', row.names = F)
