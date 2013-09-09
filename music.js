@@ -27,20 +27,23 @@ var jsynth = require('jsynth')
 var request = require('browser-request')
 
 function instrument(data,field) {
-  return function (time, index, input){
+  return function (time, index, input) {
     var i = index % data.length
-    Math.round(data[i][field] * 1e7)
-/*
-    var freq = 110 * Math.pow(2, 3) // Math.round(Math.log(data[i][field] * 1e9)) - 4)
-    console.log(freq)
-*/
-  var freq = 880
+    var freq = data[i][field + '.Freq']
     return Math.sin(2 * Math.PI * time * freq)
   }
 }
 
 request('ferry.smooth.json', function(err, res, body){
-  var data = JSON.parse(body).map(function(x) { return x[0]})
+  var data = JSON.parse(body).map(function(x) {
+    var y = x[0]
+    // var freq = 55 * Math.pow(1.1, Math.round(Math.log(y['Downtown.Passengers'] * 1e9)))
+    var freq = 440 * y['Downtown.Passengers'] * 1e8
+    console.log(freq)
+    freq = 0
+    y['Downtown.Passengers.Freq'] = freq
+    return y
+  })
 
   var synth = jsynth(master, instrument(data,'Downtown.Passengers'))
   synth.connect(master.destination)
