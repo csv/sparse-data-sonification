@@ -1,3 +1,5 @@
+library(RJSONIO)
+
 ferry <- read.csv('ferry.csv')
 ferry$time <- nrow(ferry):1
 
@@ -10,4 +12,4 @@ ferry.smooth <- data.frame(
   Midtown.Passengers = density(ferry$Midtown.Passengers, n = k * nrow(ferry))$y
 )
 
-write.csv(ferry.smooth, 'ferry.smooth.csv', row.names = F)
+write(toJSON(apply(ferry.smooth, 1, list)), 'ferry.smooth.json')
