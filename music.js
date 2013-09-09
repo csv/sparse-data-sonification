@@ -36,13 +36,7 @@ function instrument(data,field) {
 
 request('ferry.smooth.json', function(err, res, body){
   var data = JSON.parse(body).map(function(x) {
-    var y = x[0]
-    // var freq = 55 * Math.pow(1.1, Math.round(Math.log(y['Downtown.Passengers'] * 1e9)))
-    var freq = 440 * y['Downtown.Passengers'] * 1e8
-    console.log(freq)
-    freq = 0
-    y['Downtown.Passengers.Freq'] = freq
-    return y
+    return x[0]
   })
 
   var synth = jsynth(master, instrument(data,'Downtown.Passengers'))
