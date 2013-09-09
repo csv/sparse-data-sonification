@@ -1,7 +1,6 @@
 ferry <- read.csv('ferry.csv')
 ferry$time <- nrow(ferry):1
 
-
 k <- 30 * 1
 
 ferry.smooth <- data.frame(
@@ -10,3 +9,5 @@ ferry.smooth <- data.frame(
   Downtown.Passengers = density(ferry$Downtown.Passengers, n = k * nrow(ferry))$y,
   Midtown.Passengers = density(ferry$Midtown.Passengers, n = k * nrow(ferry))$y
 )
+
+write.csv(ferry.smooth, 'ferry.smooth.csv', row.names = F)
